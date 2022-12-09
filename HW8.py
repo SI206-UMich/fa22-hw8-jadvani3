@@ -18,16 +18,21 @@ def get_restaurant_data(db_filename):
     categories_dict = {}
     cur.execute("SELECT * FROM categories")
     for row in cur:
-        print(row)
         categories_dict[row[0]] = row[1]
 
     buildings_dict = {}
-    cur.execute("SELECT * FROM categories")
+    cur.execute("SELECT * FROM buildings")
     for row in cur:
-        print(row)
         buildings_dict[row[0]] = row[1]
 
-    
+    cur.execute("SELECT * FROM restaurants")
+    for row in cur:
+        dict = {}
+        dict['name'] = row[1]
+        dict['category'] = categories_dict[row[2]]
+        dict['building'] = buildings_dict[row[3]]
+        dict['rating'] = row[4]
+        list_of_restaurant_dicts.append(dict)
 
     return list_of_restaurant_dicts
 
@@ -51,7 +56,7 @@ def highest_rated_category(db_filename):#Do this through DB as well
 
 #Try calling your functions here
 def main():
-    get_restaurant_data("South_U_Restaurants.db")
+    print(get_restaurant_data("South_U_Restaurants.db"))
 
 class TestHW8(unittest.TestCase):
     def setUp(self):
