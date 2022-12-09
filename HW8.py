@@ -66,9 +66,24 @@ def barchart_restaurant_categories(db_filename):
         else:
             categories_dict[type] = 1
     
-    return categories_dict
+    sorted_dict = sorted(categories_dict.items(), key = lambda item : item[1], reverse = True)
+    sorted_dict = dict(sorted_dict)
     
-    
+
+    x_axis = list(sorted_dict.keys())
+    print(x_axis)
+    y_axis = list(sorted_dict.values())
+    fig = plt.figure(figsize = (7,5))
+    plt.barh(x_axis, y_axis)
+    plt.title("Types of Restaurant on South University Ave")
+    plt.xlabel("Number of Restaurants")
+    plt.xticks([1,2,3,4])
+    plt.ylabel("Restaurant Categories")
+    plt.tight_layout()
+    plt.gca().invert_yaxis()
+    plt.show()
+
+    return sorted_dict
 
 #EXTRA CREDIT
 def highest_rated_category(db_filename):#Do this through DB as well
@@ -83,7 +98,7 @@ def highest_rated_category(db_filename):#Do this through DB as well
 #Try calling your functions here
 def main():
     get_restaurant_data("South_U_Restaurants.db")
-    print(barchart_restaurant_categories("South_U_Restaurants.db"))
+    barchart_restaurant_categories("South_U_Restaurants.db")
 class TestHW8(unittest.TestCase):
     def setUp(self):
         self.rest_dict = {
