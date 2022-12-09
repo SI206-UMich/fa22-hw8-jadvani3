@@ -71,7 +71,6 @@ def barchart_restaurant_categories(db_filename):
     
 
     x_axis = list(sorted_dict.keys())
-    print(x_axis)
     y_axis = list(sorted_dict.values())
     fig = plt.figure(figsize = (7,5))
     plt.barh(x_axis, y_axis)
@@ -93,12 +92,57 @@ def highest_rated_category(db_filename):#Do this through DB as well
     in that category. This function should also create a bar chart that displays the categories along the y-axis
     and their ratings along the x-axis in descending order (by rating).
     """
-    pass
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path+'/'+db_filename)
+    cur = conn.cursor()
+
+    category_totals_dict = barchart_restaurant_categories(db_filename)
+    category_total_ratings_dict = {}
+    category_avg_ratings_dict = {}
+
+    categories_id_dict = {}
+    cur.execute("SELECT * FROM categories")
+    for row in cur:
+        categories_id_dict[row[0]] = row[1]
+
+    cur.execute("SELECT * FROM restaurants")
+    for row in cur:
+        category = categories_id_dict[row[2]]
+        rating = row[4]
+        if category in category_total_ratings_dict:
+            category_total_ratings_dict[category] += rating
+        else:
+            category_total_ratings_dict[category] = rating
+    
+    for key in category_total_ratings_dict:
+        category_avg_ratings_dict[key] = round(category_total_ratings_dict[key] / category_totals_dict[key], 1)
+
+    sorted_category_avg_ratings_dict = sorted(category_avg_ratings_dict.items(), key = lambda item : item[1], reverse = True)
+    sorted_category_avg_ratings_dict = dict(sorted_category_avg_ratings_dict)
+
+
+    x_axis = list(sorted_category_avg_ratings_dict.keys())
+    y_axis = list(sorted_category_avg_ratings_dict.values())
+    fig = plt.figure(figsize = (7,5))
+    plt.barh(x_axis, y_axis)
+    plt.title("Average Restaurant Ratings by Category")
+    plt.xlabel("Ratings")
+    plt.xticks([0,1,2,3,4])
+    plt.ylabel("Categories")
+    plt.tight_layout()
+    plt.gca().invert_yaxis()
+    plt.show()
+    
+    highest_rated_restaurant_category_average_rating = list(sorted_category_avg_ratings_dict.items())[0]
+
+    return highest_rated_restaurant_category_average_rating
+
 
 #Try calling your functions here
 def main():
     get_restaurant_data("South_U_Restaurants.db")
     barchart_restaurant_categories("South_U_Restaurants.db")
+    highest_rated_category("South_U_Restaurants.db")
 class TestHW8(unittest.TestCase):
     def setUp(self):
         self.rest_dict = {
